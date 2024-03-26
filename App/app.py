@@ -44,6 +44,13 @@ def user_lookup_callback(_jwt_header, jwt_data):
   identity = jwt_data["sub"]
   return User.query.get(identity)
 
+def login_user(username, password):
+  user = User.query.filter_by(username=username).first()
+  if user and user.check_password(password):
+    token = create_access_token(identity=user)
+    return token
+  return None
+
 # *************************************
 
 # Initializer Function to be used in both init command and /init route
@@ -113,6 +120,7 @@ def logout_action():
   flash('Logged out')
   return response
 
+
 # *************************************
 
 # Page Routes (To Update)
@@ -122,32 +130,55 @@ def logout_action():
 @jwt_required()
 def home_page(pokemon_id=1):
     # update pass relevant data to template
-    return render_template("home.html")
+    all_pokemon = Pokemon.query.all()
+    selected_pokemon = Pokemon.query.get(pokemon_id)
+    captured_pokemons = UserPokemon.query.where(UserPokemon.user_id == current_user.id)
+    return render_template("home.html", current_user=current_user, all_pokemon=all_pokemon, selected_pokemon=selected_pokemon, captured_pokemons=captured_pokemons)
 
 # Action Routes (To Update)
 
 @app.route("/login", methods=['POST'])
 def login_action():
   # implement login
-  return "Login Action"
+  data = request.form
+  token = login_user(data['username'], data['password'])
+  print(token)
+  response = None
+  if token:
+    flash('Logged in successfully.')
+    response = redirect(
+        url_for('home_page'))
+    set_access_cookies(response, token)
+  else:
+    flash('Invalid username or password')
+    response = redirect(url_for('login_page'))
+  return response
 
 @app.route("/pokemon/<int:pokemon_id>", methods=['POST'])
 @jwt_required()
 def capture_action(pokemon_id):
   # implement save newly captured pokemon, show a message then reload page
-  return redirect(request.referrer)
+  data = request.form.get('pokemon_name')
+  current_user.catch_pokemon(pokemon_id, data)
+  flash('Pokemon Captured')
+  return redirect(url_for('home_page'))
 
 @app.route("/rename-pokemon/<int:pokemon_id>", methods=['POST'])
 @jwt_required()
 def rename_action(pokemon_id):
   # implement rename pokemon, show a message then reload page
-  return redirect(request.referrer)
+  data = request.form.get('pokemon_name')
+  current_user.rename_pokemon(pokemon_id, data)
+  flash('Pokemon Renamed')
+  return redirect(url_for('home_page'))
 
 @app.route("/release-pokemon/<int:pokemon_id>", methods=['GET'])
 @jwt_required()
 def release_action(pokemon_id):
   # implement release pokemon, show a message then reload page
-  return redirect(request.referrer)
+  current_user.release_pokemon(pokemon_id)
+  flash('Pokemon Deleted')
+  return redirect(url_for('home_page'))
 
 if __name__ == "__main__":
   app.run(host='0.0.0.0', port=8080)
