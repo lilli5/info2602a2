@@ -42,14 +42,14 @@
 
             <div id="pokemon-detail">
                  <!-- Show pokemon details here -->
-                <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/{{selected_pokemon.id}}.png">
-                <p><span class="card-title">{{selected_pokemon.name}}</span></p>
-                <p>Type 1: {{selected_pokemon.type1}}</p>
-                {% if selected_pokemon.type2 %}
-                    <p>Type 2: {{selected_pokemon.type2}}</p>
-                {% endif %}
+                <span class="card-title">
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/{{selected_pokemon.id}}.png"> 
+                {{selected_pokemon.name}}
+                </span>
+                <p>Type1: {{selected_pokemon.type1}}</p>
+                <p>Type2: {{selected_pokemon.type2}}</p>
                 <p>Weight: {{selected_pokemon.weight}}</p>
-                <p>Height: {{selected_pokemon.height}}</p>                        
+                <p>Height: {{selected_pokemon.height}}</p>
             </div>
 
             <form action= "/pokemon/{{selected_pokemon.id}}" method="post">
@@ -70,23 +70,25 @@
                 </tr>
             </thead>
             <tbody>
-              <!-- show captured pokemon here with controls to rename and release for each pokemon -->
-              {% for poke in captured_pokemon %}
-              <tr id="{{poke.name}}-row">
-                  <td>{{poke.pokemon.name}}</td>
-                  <td>{{poke.name}}</td>
-                  <td>
-                    <form action= "/rename-pokemon/{{poke.id}}" method="post">
-                        <input id="pokemon_name" type="text" name="pokemon_name">                            
-                        <button id="rename-{{poke.name}}" type="submit" class="btn" style="background-color: #E53935;"> Rename </button>
+            <!-- show captured pokemon here with controls to rename and release for each pokemon -->
+            {% for poke in captured_pokemon %}
+                
+                <tr id="{{poke.name}}-row">
+                    <td>{{poke.pokemon.name}}</td>
+                    <td>{{poke.name}}</td>
+                    <td>
+                        <form action= "/rename-pokemon/{{poke.id}}" method="post">
+                            <input id="pokemon_name" type="text" name="pokemon_name">                            
+                            <button id="rename-{{poke.name}}" type="submit" class="btn" style="background-color: #E53935;"> Rename </button>
                     
-                        <form action= "/release-pokemon/{{poke.id}}" method="post">
-                            <button id="release-{{poke.name}}" type="submit" class="btn" style="background-color: #E53935;"> Release </button>
+                            <form action= "/release-pokemon/{{poke.id}}" method="post">
+                                <button id="release-{{poke.name}}" type="submit" class="btn" style="background-color: #E53935;"> Release </button>
+                            </form>
                         </form>
-                    </form>
-                  </td>
-              </tr>
-      {% endfor %} 
+                    </td>
+                </tr>
+            
+            {% endfor %} 
             </tbody>
         </table>
     </div>
