@@ -132,8 +132,8 @@ def home_page(pokemon_id=1):
     # update pass relevant data to template
     all_pokemon = Pokemon.query.all()
     selected_pokemon = Pokemon.query.get(pokemon_id)
-    captured_pokemons = UserPokemon.query.where(UserPokemon.user_id == current_user.id)
-    return render_template("home.html", current_user=current_user, all_pokemon=all_pokemon, selected_pokemon=selected_pokemon, captured_pokemons=captured_pokemons)
+    captured_pokemon = UserPokemon.query.where(UserPokemon.user_id == current_user.id)
+    return render_template("home.html", current_user=current_user, all_pokemon=all_pokemon, selected_pokemon=selected_pokemon, captured_pokemon=captured_pokemon)
 
 # Action Routes (To Update)
 
